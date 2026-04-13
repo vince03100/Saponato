@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>SapoNaMi — Torneo di Calcio 2026</title>
+  <meta name="description" content="Torneo Saponato SapoNaMi — 1/8 Luglio 2026 · Mirandola"/>
+  <meta name="theme-color" content="#030a14"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+</head>
+<body>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-ring"></div>
+    <div class="loader-ring"></div>
+    <img src="assets/logo.png" alt="SapoNaMi" class="loader-logo"/>
+    <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+    <div class="loader-txt">🫧 Insaponando il campo...</div>
+    <div class="loader-foam">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <canvas id="canvas-bubbles"></canvas>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <a href="#hero" class="nav-logo">
+      <img src="assets/logo.png" alt="SapoNaMi"/>
+    </a>
+    <div class="navbar-soap-line"></div>
+    <ul class="nav-links">
+      <li><a href="#gironi">Gironi</a></li>
+      <li><a href="#risultati">Risultati</a></li>
+      <li><a href="#calendario">Calendario</a></li>
+      <li><a href="#bracket">Playoff</a></li>
+    </ul>
+    <div class="nav-badge">1 — 8 LUG 2026</div>
+    <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-orb"></div>
+    <div class="hero-orb"></div>
+    <div class="hero-orb"></div>
+    <div class="hero-grid"></div>
+
+    <div class="hero-content">
+      <div class="hero-logo-wrap">
+        <div class="hero-orbit"><span class="orbit-dot">🫧</span></div>
+        <div class="hero-orbit"><span class="orbit-dot">⚽</span></div>
+        <div class="hero-logo-halo"></div>
+        <img src="assets/logo.png" alt="SapoNaMi" class="hero-logo"/>
+        <div class="logo-foam">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="hero-soap-tag">
+        <span class="b-icon">🫧</span>
+        Il Torneo più Scivoloso dell'Estate
+        <span class="b-icon">🫧</span>
+      </div>
+      <div class="hero-pretitle">Saponato Estivo 2026</div>
+      <p class="hero-subtitle">1 – 8 Luglio 2026 &nbsp;·&nbsp; Mirandola</p>
+      <p class="hero-venue">📍 Centro Polivalente Bocciofila &nbsp;·&nbsp; Via Circonvallazione, n.19</p>
+
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="n" data-target="32">0</div><div class="l">Squadre</div></div>
+        <div class="stat-div"></div>
+        <div class="hero-stat"><div class="n" data-target="8">0</div><div class="l">Gironi</div></div>
+        <div class="stat-div"></div>
+        <div class="hero-stat"><div class="n gold-n" data-target="8">0</div><div class="l">Giorni</div></div>
+        <div class="stat-div"></div>
+        <div class="hero-stat"><div class="n" data-target="48">0</div><div class="l">Partite</div></div>
+      </div>
+
+      <div class="hero-ctas">
+        <a href="#gironi"    class="btn btn-primary">🫧 Classifiche</a>
+        <a href="#risultati" class="btn btn-gold">⚽ Risultati</a>
+        <a href="#bracket"   class="btn btn-outline">🏆 Playoff</a>
+      </div>
+    </div>
+
+    <div class="hero-scroll"><div class="scroll-line"></div><span>Scorri</span></div>
+
+    <div class="hero-wave-transition">
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none" fill="#dff3ff">
+        <path d="M0,60 C240,100 480,10 720,60 C960,110 1200,20 1440,60 L1440,100 L0,100 Z"/>
+        <path d="M0,60 C240,100 480,10 720,60 C960,110 1200,20 1440,60 L1440,100 L0,100 Z" transform="translate(720,0)"/>
+      </svg>
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none" fill="rgba(200,234,255,0.6)">
+        <path d="M0,70 C360,20 720,90 1080,40 C1260,15 1380,65 1440,70 L1440,100 L0,100 Z"/>
+        <path d="M0,70 C360,20 720,90 1080,40 C1260,15 1380,65 1440,70 L1440,100 L0,100 Z" transform="translate(720,0)"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- COUNTDOWN -->
+  <section id="countdown-section">
+    <div class="countdown-label">
+      <span>🫧</span> Conto alla rovescia <span>🫧</span>
+    </div>
+    <div class="countdown-sublabel">Al via del SapoNaMi · 1 Luglio 2026</div>
+    <div class="countdown-grid" id="cd-grid">
+      <div class="cd-unit">
+        <div class="cd-box">
+          <div class="cd-number" id="cd-days">00</div>
+          <div class="cd-label">Giorni</div>
+          <div class="cd-foam"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <div class="cd-box">
+          <div class="cd-number" id="cd-hours">00</div>
+          <div class="cd-label">Ore</div>
+          <div class="cd-foam"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <div class="cd-box">
+          <div class="cd-number" id="cd-minutes">00</div>
+          <div class="cd-label">Minuti</div>
+          <div class="cd-foam"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <div class="cd-box">
+          <div class="cd-number" id="cd-seconds">00</div>
+          <div class="cd-label">Secondi</div>
+          <div class="cd-foam"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cd-finished" id="cd-finished" style="display:none">
+      🏆 Il torneo è iniziato! In campo! 🫧
+    </div>
+  </section>
+
+  <!-- GIRONI -->
+  <section id="gironi">
+    <div class="section-header">
+      <div class="section-tag">🫧 Fase a gruppi</div>
+      <h2 class="section-title">CLASSIFICHE</h2>
+      <p class="section-desc">32 squadre in 8 gironi. Le prime 2 accedono ai quarti di finale.</p>
+    </div>
+    <div class="gironi-filter">
+      <button class="filter-btn active" data-grp="all">Tutti</button>
+      <button class="filter-btn" data-grp="A">A</button>
+      <button class="filter-btn" data-grp="B">B</button>
+      <button class="filter-btn" data-grp="C">C</button>
+      <button class="filter-btn" data-grp="D">D</button>
+      <button class="filter-btn" data-grp="E">E</button>
+      <button class="filter-btn" data-grp="F">F</button>
+      <button class="filter-btn" data-grp="G">G</button>
+      <button class="filter-btn" data-grp="H">H</button>
+    </div>
+    <div class="groups-grid" id="groups-container"></div>
+  </section>
+
+  <!-- RISULTATI -->
+  <section id="risultati">
+    <div class="section-header">
+      <div class="section-tag gold">⚽ Partite giocate</div>
+      <h2 class="section-title gold-title">RISULTATI</h2>
+      <p class="section-desc">Tutti i risultati aggiornati giornata per giornata.</p>
+    </div>
+    <div class="matches-wrapper" id="played-list"></div>
+  </section>
+
+  <!-- CALENDARIO -->
+  <section id="calendario">
+    <div class="section-header">
+      <div class="section-tag">📅 Prossime partite</div>
+      <h2 class="section-title">CALENDARIO</h2>
+      <p class="section-desc">Le partite ancora da giocare, dai quarti alla grande finale.</p>
+    </div>
+    <div class="matches-wrapper" id="upcoming-list"></div>
+  </section>
+
+  <!-- BRACKET -->
+  <section id="bracket">
+    <div class="section-header">
+      <div class="section-tag gold">🏆 Eliminazione diretta</div>
+      <h2 class="section-title gold-title">PLAYOFF</h2>
+      <p class="section-desc">Chi sopravviverà al sapone e alzerà la coppa?</p>
+    </div>
+    <div class="bracket-wrap" id="bracket-content"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-foam">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <img src="assets/logo.png" alt="SapoNaMi" class="footer-logo"/>
+    <p class="footer-sub">Torneo di Calcio Saponato &nbsp;·&nbsp; Mirandola, 1-8 Luglio 2026</p>
+    <p class="footer-venue">📍 Centro Polivalente Bocciofila, Via Circonvallazione n.19</p>
+    <p class="footer-copy">
+      Attenti a non scivolare 🫧 &nbsp;—&nbsp;
+      forza <strong style="color:var(--gold)">Latine Selvaggi</strong> 🏆
+    </p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
