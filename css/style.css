@@ -168,7 +168,11 @@ body{background:var(--hero-bg);color:white;font-family:var(--font-body);font-siz
 
 /* THE LOGO — just the img, dark bg blends black away */
 .hero-logo{
-  width:clamp(240px,38vw,480px);height:auto;
+  width:clamp(280px,44vw,560px);
+  height:auto;
+  max-height:none;
+  object-fit:contain;
+  display:block;
   filter:drop-shadow(0 0 30px rgba(26,143,255,.4)) drop-shadow(0 0 60px rgba(26,143,255,.15));
   animation:logo-float 6s ease-in-out infinite;
   position:relative;z-index:1;cursor:pointer;
@@ -216,9 +220,6 @@ body{background:var(--hero-bg);color:white;font-family:var(--font-body);font-siz
 @keyframes scroll-bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
 
 /* wave transition from dark hero to light sections */
-.hero-wave-transition{position:absolute;bottom:0;left:0;right:0;height:100px;overflow:hidden;z-index:3;pointer-events:none}
-.hero-wave-transition svg{position:absolute;bottom:0;width:200%;height:100px;animation:wave-scroll 9s linear infinite}
-.hero-wave-transition svg:nth-child(2){animation:wave-scroll 13s linear infinite reverse;animation-delay:-4s;opacity:.6}
 @keyframes wave-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* ══════════════════════════════════════════════════
