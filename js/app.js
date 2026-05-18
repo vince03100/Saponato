@@ -223,3 +223,197 @@ renderDayList(PLAYED,'played-list');
 renderDayList(UPCOMING,'upcoming-list');
 renderBracket();
 updateNav();
+
+/* ══════════════════════════════════════════════════════════
+   LIVE SECTION — Google Sheets backend
+   Aggiorna ogni 30 secondi automaticamente
+   
+   Struttura del Google Sheet (una riga per partita):
+   Colonna A: casa        (es. "Latine Selvaggi")
+   Colonna B: ospite      (es. "Roma FC")
+   Colonna C: gol_casa    (es. 2)
+   Colonna D: gol_ospite  (es. 1)
+   Colonna E: stato       ("in corso" / "finita" / "da giocare")
+   Colonna F: girone      (es. "A" o "Quarti")
+   Colonna G: orario      (es. "18:30") - opzionale
+══════════════════════════════════════════════════════════ */
+
+(function(){
+  const REFRESH_MS = 30000; // aggiorna ogni 30 secondi
+  let refreshTimer = null;
+  let lastFetch = null;
+
+  const sheetEl   = document.getElementById('live-sheet-id');
+  const SHEET_ID  = sheetEl ? sheetEl.dataset.id : '';
+
+  const statusDot = document.querySelector('.live-dot');
+  const statusTxt = document.getElementById('live-status-txt');
+  const updatedEl = document.getElementById('live-updated');
+  const loadingEl = document.getElementById('live-loading');
+  const matchesEl = document.getElementById('live-matches');
+  const emptyEl   = document.getElementById('live-empty');
+  const setupEl   = document.getElementById('live-setup');
+
+  function setStatus(type, txt){
+    if(!statusDot||!statusTxt) return;
+    statusDot.className = 'live-dot' + (type==='ok'?' ok':type==='err'?' err':'');
+    statusTxt.textContent = txt;
+  }
+
+  function updateTimestamp(){
+    if(!updatedEl) return;
+    const now = new Date();
+    updatedEl.textContent = `Aggiornato alle ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+  }
+
+  function parseCSV(csv){
+    const lines = csv.trim().split('\n').filter(l=>l.trim());
+    // skip header if first row looks like a header
+    const start = /^[a-zA-Z]/.test(lines[0]) ? 1 : 0;
+    return lines.slice(start).map(line=>{
+      // handle quoted fields
+      const cells = [];
+      let cur='', inQ=false;
+      for(let i=0;i<line.length;i++){
+        if(line[i]==='"'){inQ=!inQ}
+        else if(line[i]===','&&!inQ){cells.push(cur.trim());cur=''}
+        else cur+=line[i];
+      }
+      cells.push(cur.trim());
+      return {
+        casa:      cells[0]||'',
+        ospite:    cells[1]||'',
+        gol_casa:  cells[2]||'',
+        gol_ospite:cells[3]||'',
+        stato:     (cells[4]||'da giocare').toLowerCase().trim(),
+        girone:    cells[5]||'',
+        orario:    cells[6]||'',
+      };
+    }).filter(m=>m.casa||m.ospite);
+  }
+
+  function statoClass(stato){
+    if(stato.includes('corso')||stato==='live'||stato==='in corso') return 'stato-live';
+    if(stato.includes('finit')||stato==='fine') return 'stato-finita';
+    return 'stato-attesa';
+  }
+  function statoBadge(stato){
+    if(stato.includes('corso')||stato==='live') return '<span class="live-card-badge live">🔴 LIVE</span>';
+    if(stato.includes('finit')) return '<span class="live-card-badge finita">✅ FINITA</span>';
+    return '<span class="live-card-badge attesa">🕐 DA GIOCARE</span>';
+  }
+
+  function renderMatches(matches){
+    if(!matchesEl) return;
+
+    // Sort: live first, then da giocare, then finita
+    const order = m => {
+      const s = m.stato;
+      if(s.includes('corso')||s==='live') return 0;
+      if(s.includes('da giocare')||s===''||s==='attesa') return 1;
+      return 2;
+    };
+    matches.sort((a,b)=>order(a)-order(b));
+
+    // Group by stato
+    const groups = {};
+    matches.forEach(m=>{
+      const key = order(m)===0?'🔴 In Corso':order(m)===1?'⏳ Da Giocare':'✅ Terminate';
+      if(!groups[key]) groups[key]=[];
+      groups[key].push(m);
+    });
+
+    let html = '';
+    Object.entries(groups).forEach(([grp, ms])=>{
+      const isLive = grp.includes('Corso');
+      html += `<div class="live-day-block">
+        <div class="live-day-header">
+          <span class="live-day-badge">${grp}</span>
+          <div class="live-day-line"></div>
+        </div>`;
+      ms.forEach(m=>{
+        const sc = m.stato;
+        const isCorso = sc.includes('corso')||sc==='live';
+        const isFinita = sc.includes('finit');
+        const showScore = isCorso || isFinita;
+        const hC = showScore && m.gol_casa>m.gol_ospite ? 'winner' : showScore && m.gol_casa<m.gol_ospite ? 'loser' : '';
+        const aC = showScore && m.gol_ospite>m.gol_casa ? 'winner' : showScore && m.gol_ospite<m.gol_casa ? 'loser' : '';
+        const scoreHtml = showScore
+          ? `<div class="lc-score ${isCorso?'live-score':''}">${m.gol_casa} — ${m.gol_ospite}</div>`
+          : `<div class="lc-score attesa-score">${m.orario||'–:––'}</div>`;
+        const gironeHtml = m.girone ? `<div class="lc-girone">${m.girone.toLowerCase().includes('giron')?m.girone:'Girone '+m.girone}</div>` : '';
+        html += `<div class="live-card ${statoClass(sc)}">
+          ${statoBadge(sc)}
+          <div class="lc-team home ${hC}">${esc(m.casa)}</div>
+          <div class="lc-center">${gironeHtml}${scoreHtml}</div>
+          <div class="lc-team ${aC}">${esc(m.ospite)}</div>
+        </div>`;
+      });
+      html += '</div>';
+    });
+
+    matchesEl.innerHTML = html;
+  }
+
+  async function fetchLive(){
+    if(!SHEET_ID || SHEET_ID==='IL_TUO_SHEET_ID_QUI'){
+      setStatus('', 'Configura il Google Sheet per attivare il Live');
+      if(loadingEl) loadingEl.style.display='none';
+      if(setupEl)   setupEl.style.display='block';
+      return;
+    }
+
+    if(setupEl) setupEl.style.display='none';
+    setStatus('', 'Aggiornamento...');
+
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+
+    try {
+      const res = await fetch(url, {cache:'no-store'});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const csv = await res.text();
+      const matches = parseCSV(csv);
+
+      if(loadingEl) loadingEl.style.display='none';
+
+      if(matches.length===0){
+        if(emptyEl) emptyEl.style.display='block';
+        if(matchesEl) matchesEl.innerHTML='';
+        setStatus('ok', 'Connesso — nessuna partita');
+      } else {
+        if(emptyEl) emptyEl.style.display='none';
+        renderMatches(matches);
+        const live = matches.filter(m=>m.stato.includes('corso')||m.stato==='live').length;
+        setStatus('ok', live>0 ? `${live} partita${live>1?'e':''} in corso` : 'Connesso — nessuna partita in corso');
+      }
+      updateTimestamp();
+      lastFetch = Date.now();
+    } catch(err){
+      setStatus('err', 'Errore di connessione — riprovo tra 30s');
+      if(loadingEl) loadingEl.style.display='none';
+      if(matchesEl && !matchesEl.innerHTML) {
+        if(emptyEl) emptyEl.style.display='block';
+      }
+    }
+
+    // schedule next refresh
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(fetchLive, REFRESH_MS);
+  }
+
+  // Start fetching when live section enters viewport
+  const liveObs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        fetchLive();
+        liveObs.unobserve(e.target);
+      }
+    });
+  },{threshold:.1});
+
+  const liveSec = document.getElementById('live');
+  if(liveSec) liveObs.observe(liveSec);
+
+  // Also expose globally so you can call fetchLive() from console
+  window.sapoLiveRefresh = fetchLive;
+})();
